@@ -2,15 +2,22 @@
 <html>
 <head>
   <title>Network | Basic usage</title>
-
+  <script src="http://d3js.org/d3.v3.min.js"></script>
   <script type="text/javascript" src="http://localhost:3000/static/js/lib/dist/vis.js"></script>
+  <script src="http://localhost:3000/static/js/lib/jsnetworkx.js"></script>
   <link href="http://localhost:3000/static/js/lib/dist/vis.css" rel="stylesheet" type="text/css" />
-
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
   <style type="text/css">
     #mynetwork {
-      width: 600px;
-      height: 400px;
+      width: 100%;
+      min-height: 100%;
+      height:500px;
       border: 1px solid lightgray;
+    }
+    #canvas {
+      width: 100%;
+      height: 800px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
@@ -22,6 +29,7 @@
 <div class="result"></div>
 
 <div id="mynetwork"></div>
+<div id="canvas"></div>
 <script src="http://localhost:3000/static/js/lib/jquery-3.1.1.min.js"></script>
 
 <script type="text/javascript">
@@ -41,42 +49,161 @@
         edges: edges
       };
       var options = {
-      nodes: {
-        shape: 'dot',
-        scaling: {
-          min: 10,
-          max: 30,
-          label: {
-            min: 8,
-            max: 30,
-            drawThreshold: 12,
-            maxVisible: 20
-          }
-        },
-        font: {
-          size: 12,
-          face: 'Tahoma'
-        }
-      },
-      edges: {
-        width: 0.15,
-        color: {inherit: 'from'},
-        smooth: {
-          type: 'continuous'
-        }
-      },
-      physics: true,
-      interaction: {
-        tooltipDelay: 200,
-        hideEdgesOnDrag: true
-      },
-      layout:{
-        improvedLayout: false
-      }
+            interaction: {
+                dragNodes: true,
+                dragView: true,
+                hideEdgesOnDrag: false,
+                hideNodesOnDrag: false,
+                hover: true,
+                hoverConnectedEdges: false,
+                keyboard: {
+                    enabled: false,
+                    speed: {x: 10, y: 10, zoom: 0.02},
+                    bindToWindow: true
+                },
+                navigationButtons: true,
+                selectable: true,
+                selectConnectedEdges: false,
+                tooltipDelay: 100,
+                zoomView: true,
+                tooltipDelay: 200,
+                hideEdgesOnDrag: true
+            },
+            layout: {
+                hierarchical: {
+                    enabled: false,
+                    levelSeparation: 150,
+                    direction: 'UD',   // UD, DU, LR, RL
+                    sortMethod: 'hubsize' // hubsize, directed
+                },
+                improvedLayout:false
+            },
+
+            nodes: {
+                labelHighlightBold: false,
+                font: {
+                    color: '#555',
+                },
+                color: {
+                    border: 'null',
+                    background: '#97C2FC',
+                    highlight: {
+                        border: '#2B7CE9',
+                        background: '#D2E5FF'
+                    },
+                    hover: {
+                        border: '#2B7CE9',
+                        background: '#D2E5FF'
+                    }
+                }
+            },
+            edges: {
+                labelHighlightBold: false,
+                arrows: {
+                    to:{
+                        enabled: true,
+                        scaleFactor: 1
+                    }
+                },
+                font: {
+                    face: 'FontAwesome',
+                    size: 15,
+                    color: '#666'
+                },
+                //dashes: true,
+                width: 1,
+                hoverWidth: 0,
+                selectionWidth: 0,
+                color: '#999',
+                //color: {
+                //    color: '#999',
+                //    hover: '#000',
+                //    // selected color
+                //    //highlight: '#c1c1c1'
+                //},
+                smooth: {
+                    enabled: false
+                }
+            },
+            physics: {
+                stabilization: {
+                    enabled: false,
+                    iterations: 1000,
+                    updateInterval: 100,
+                    onlyDynamicEdges: false,
+                    fit: true
+                },
+                solver: 'forceAtlas2Based',
+                forceAtlas2Based: {
+                    gravitationalConstant: -50,
+                    centralGravity: 0.01,
+                    springConstant: 0.08,
+                    springLength: 200,
+                    damping: 0.4,
+                    avoidOverlap: 100
+                },
+            },
+            groups: {
+              male: {
+                shape: 'icon',
+                icon: {
+                  face: 'FontAwesome',
+                  code: '\uf183',
+                  size: 50,
+                  color: '#00adef'
+                }
+              },
+              female: {
+                shape: 'icon',
+                icon: {
+                  face: 'FontAwesome',
+                  code: '\uf182',
+                  size: 50,
+                  color: '#ed008c'
+                }
+              }
+            }
     };
       var network = new vis.Network(container, data, options)
       
     })
+  })
+
+  $(function(){
+    var G = new jsnx.Graph();
+ 
+G.addNodesFrom([1,2,3,4], {group:0});
+G.addNodesFrom([5,6,7], {group:1});
+G.addNodesFrom([8,9,10,11], {group:2});
+ 
+G.addPath([1,2,5,6,7,8,11]);
+G.addEdgesFrom([[1,3],[1,4],[3,4],[2,3],[2,4],[8,9],[8,10],[9,10],[11,10],[11,9]]);
+ 
+var color = d3.scale.category20();
+
+var bc = jsnx.betweennessCentrality(G, optParameters={})
+console.log(bc)
+
+jsnx.draw(G, {
+    element: '#canvas',
+    layoutAttr: {
+        charge: -120,
+        linkDistance: 20
+    },
+    nodeAttr: {
+        r: 5,
+        title: function(d) { return d.label;}
+    },
+    nodeStyle: {
+        fill: function(d) { 
+            return color(d.data.group); 
+        },
+        stroke: 'none'
+    },
+    edgeStyle: {
+        fill: '#999'
+    }
+});
   })
   
 </script>
