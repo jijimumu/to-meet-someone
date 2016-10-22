@@ -2,8 +2,8 @@ var express = require("express")
 var app     = express()
 var path    = require("path")
 var fs = require('fs')
-var nodes = require('./csv/names.json')
-var edges = require('./csv/social_network.json')
+// var nodes = require('./csv/names.json')
+// var edges = require('./csv/social_network.json')
 var cpnNodes = []
 var cpnEdges = []
 var cpnNodesWinner = []
@@ -13,7 +13,7 @@ var idWinner = []
 var limit = 200
 
 
-var stringEdges = JSON.stringify(edges)
+// var stringEdges = JSON.stringify(edges)
 
 
 // var winner = []
@@ -73,45 +73,41 @@ var winner_id = []
 app.use(express.static('public'))
 
 
-function dataPreProcess(){
-	for(var i=0; i<limit; i++){
-		geek_component.push(geek[i])
-		winner_component.push(winner[i])
-		geek_id.push(geek_component[i].id)
-		winner_id.push(winner_component[i].id)
-	}
+// function dataPreProcess(){
+// 	for(var i=0; i<limit; i++){
+// 		geek_component.push(geek[i])
+// 		winner_component.push(winner[i])
+// 		geek_id.push(geek_component[i].id)
+// 		winner_id.push(winner_component[i].id)
+// 	}
 	
-	for(var j=0; j<geek_network.length; j++){
-		// console.log(edges[j])
-		if(geek_id.indexOf(geek_network[j].from) > 0 || geek_id.indexOf(geek_network[j].to) >0){
-			geek_network_component.push(geek_network[j])
-		}
-		if(winner_id.indexOf(winner_network[j].from) > 0 || winner_id.indexOf(winner_network[j].to) >0){
-			winner_network_component.push(winner_network[j])
-		}
-	}
+// 	for(var j=0; j<geek_network.length; j++){
+// 		// console.log(edges[j])
+// 		if(geek_id.indexOf(geek_network[j].from) > 0 || geek_id.indexOf(geek_network[j].to) >0){
+// 			geek_network_component.push(geek_network[j])
+// 		}
+// 		if(winner_id.indexOf(winner_network[j].from) > 0 || winner_id.indexOf(winner_network[j].to) >0){
+// 			winner_network_component.push(winner_network[j])
+// 		}
+// 	}
 	
-}
-dataPreProcess()
-var totalNodes = geek_component.concat(winner_component)
-var totalEdges = geek_network_component.concat(winner_network_component)
+// }
+// dataPreProcess()
+// var totalNodes = geek_component.concat(winner_component)
+// var totalEdges = geek_network_component.concat(winner_network_component)
 
-console.log('totalNodes = ' + totalNodes.length)
-console.log('totalEdges = ' + totalEdges.length)
+
 
 app.use('/static', express.static('public'))
 
 app.get('/',function(req,res){
-  res.sendFile(path.join(__dirname+'/index.html'))
+  res.sendFile(path.join(__dirname+'/graph.html'))
 })
 
-app.get('/about',function(req,res){
-  res.sendFile(path.join(__dirname+'/about.html'))
-})
 
 app.get('/graph',function(req,res){
 	res.setHeader('Content-Type', 'application/json')
-	res.send(JSON.stringify({nodes:totalNodes,edges:totalEdges}))
+	res.send(JSON.stringify(require('./csv/'+req.query.file)))
 })
 
 app.get('/edges',function(req,res){
@@ -123,6 +119,6 @@ app.get('/sitemap',function(req,res){
   res.sendFile(path.join(__dirname+'/sitemap.html'))
 });
 
-app.listen(3000)
+app.listen(8080)
 
-console.log("Running at Port 3000")
+console.log("Running at Port 8080")
