@@ -6,30 +6,18 @@ var nodes = require('./csv/names.json')
 var edges = require('./csv/social_network.json')
 var cpnNodes = []
 var cpnEdges = []
+var cpnNodesWinner = []
+var cpnEdgesWinner = []
 var id = []
-var limit = 400
+var idWinner = []
+var limit = 200
 
 
 var stringEdges = JSON.stringify(edges)
 
 
-function dataPreProcess(){
-	for(var i=0; i<limit; i++){
-		cpnNodes.push(nodes[i])
-		id.push(nodes[i].id)
-	}
-	console.log(cpnNodes)
-	console.log(id)
-	for(var j=0; j<edges.length; j++){
-		// console.log(edges[j])
-		if(id.indexOf(edges[j].from) > 0 || id.indexOf(edges[j].to) >0){
-			cpnEdges.push(edges[j])
-		}
-	}
-	
-}
-var winner = []
-var winner_network = [] 
+// var winner = []
+// var winner_network = [] 
 function dump(){
 	var geek = require('./geek.json')
 	var geek_network = require('./geek_network.json') 
@@ -74,10 +62,42 @@ var geek = require('./geek.json')
 var geek_network = require('./geek_network.json')
 var winner = require('./winner.json')
 var winner_network = require('./winner_network.json')
+var geek_component = []
+var geek_network_component = []
+var winner_component = []
+var winner_network_component = []
+var geek_id = []
+var winner_id = []
 
-var totalNodes = geek.concat(winner)
-var totalEdges = geek_network.concat(winner_network)
+
 app.use(express.static('public'))
+
+
+function dataPreProcess(){
+	for(var i=0; i<limit; i++){
+		geek_component.push(geek[i])
+		winner_component.push(winner[i])
+		geek_id.push(geek_component[i].id)
+		winner_id.push(winner_component[i].id)
+	}
+	
+	for(var j=0; j<geek_network.length; j++){
+		// console.log(edges[j])
+		if(geek_id.indexOf(geek_network[j].from) > 0 || geek_id.indexOf(geek_network[j].to) >0){
+			geek_network_component.push(geek_network[j])
+		}
+		if(winner_id.indexOf(winner_network[j].from) > 0 || winner_id.indexOf(winner_network[j].to) >0){
+			winner_network_component.push(winner_network[j])
+		}
+	}
+	
+}
+dataPreProcess()
+var totalNodes = geek_component.concat(winner_component)
+var totalEdges = geek_network_component.concat(winner_network_component)
+
+console.log('totalNodes = ' + totalNodes.length)
+console.log('totalEdges = ' + totalEdges.length)
 
 app.use('/static', express.static('public'))
 
