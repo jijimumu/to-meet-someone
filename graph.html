@@ -152,16 +152,25 @@
           target: data[i].to
         })
       }
-      oNodes = _.map(nodes,function(o){
+      var oNodes = _.map(nodes,function(o){
         return {
           id: o,
-          x: 100 * Math.cos(2 * i * Math.PI / nodes.length),
-          y: 100 * Math.sin(2 * i * Math.PI / nodes.length),
-          size: Math.random()
+          x: 100 * Math.cos(2 * i * Math.PI / 1),
+          y: 100 * Math.sin(2 * i * Math.PI / 1),
+          size: 0.1
         }
       })
-
-      
+      // var oNodes = []
+      // for(var j=0;j<5000;j++){
+      //   nodes.push({
+      //     id: j,
+      //     x: 100 * Math.cos(2 * j * Math.PI / 500),
+      //     y: 100 * Math.sin(2 * j * Math.PI / 500),
+      //     size: Math.random()
+      //   })
+      // }
+      console.log(nodes)
+      console.log(edges)
 
       return { nodes: oNodes, edges: edges}
     },
@@ -420,7 +429,7 @@
         });
 
         // Start the ForceAtlas2 algorithm:
-        s.startForceAtlas2({worker: true, barnesHutOptimize: false});
+        s.startForceAtlas2({worker: true, barnesHutOptimize: false, edgeWeightInfluence:1, adjustSizes:true, scalingRatio:0.1});
 
 
 
